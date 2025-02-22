@@ -37,6 +37,8 @@ fn main() {
     let target_frame_duration = Duration::from_secs_f32(1.0 / 60.0);
 
     event_loop.run(move |event, _, control_flow| {
+        *control_flow = ControlFlow::Poll;
+
         match event {
             Event::WindowEvent {
                 event: WindowEvent::KeyboardInput {
@@ -67,10 +69,7 @@ fn main() {
                 game.set_delta_time(delta_time);
                 game.run();
 
-                let frame_time = current_time.elapsed();
-                if frame_time < target_frame_duration {
-                    std::thread::sleep(target_frame_duration - frame_time);
-                }
+                window.request_redraw();
             }
             _ => (),
         }

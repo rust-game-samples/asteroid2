@@ -114,13 +114,11 @@ impl Game {
         game
     }
 
-    /// ゲームループを実行
+    /// 1フレーム分のゲーム更新を実行
     pub fn run(&mut self) {
-        while self.running {
-            self.process_input();
-            self.update_game();
-            self.generate_output();
-        }
+        self.process_input();
+        self.update_game();
+        self.generate_output();
     }
 
     /// 新しいアクターを追加
@@ -146,7 +144,7 @@ impl Game {
 
     /// 入力処理
     fn process_input(&mut self) {
-        // アクターのInputComponentに押されているキーを渡す
+        println!("Processing input with keys: {:?}", self.pressed_keys);
         for actor in self.actors.values_mut() {
             if let Some(input) = actor.get_component_mut::<InputComponent>() {
                 input.process_input(&self.pressed_keys);
@@ -233,9 +231,11 @@ impl Game {
 
     // キー押下状態を更新するメソッドを追加
     pub fn handle_keyboard_input(&mut self, keycode: VirtualKeyCode, pressed: bool) {
+        println!("Key event: {:?}, pressed: {}", keycode, pressed);
         if pressed {
             if !self.pressed_keys.contains(&keycode) {
                 self.pressed_keys.push(keycode);
+                println!("Current pressed keys: {:?}", self.pressed_keys);
             }
         } else {
             self.pressed_keys.retain(|&k| k != keycode);
