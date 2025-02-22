@@ -19,6 +19,8 @@ pub trait Component: Any {
     fn owner_mut(&mut self) -> Option<&mut Actor>;
 
     fn as_any_mut(&mut self) -> &mut dyn Any;
+
+    fn as_any(&self) -> &dyn Any;
 }
 
 /// コンポーネントの基本実装のためのベース構造体

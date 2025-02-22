@@ -3,6 +3,7 @@ use super::input_component::InputComponent;
 use super::laser::Laser;
 use super::move_component::MoveComponent;
 use super::ship::Ship;
+use super::sprite_component::SpriteComponent;
 use super::texture::TextureManager;
 use super::vector2::Vector2;
 use std::collections::HashMap;
@@ -184,9 +185,12 @@ impl Game {
             });
 
             render_pass.set_pipeline(&self.render_pipeline);
-            // ここでスプライトを描画
+
+            // アクターのスプライトを描画
             for actor in self.actors.values() {
-                // アクターのコンポーネントを描画
+                if let Some(sprite) = actor.get_component::<SpriteComponent>() {
+                    sprite.draw(&mut render_pass);
+                }
             }
         }
 
@@ -253,10 +257,13 @@ impl Game {
             actor.set_scale(Vector2::one());
 
             let ship = Ship::new(&mut self.texture_manager);
+            let sprite = SpriteComponent::new("Asteroid.png", 100, &mut self.texture_manager);
+
             let mut move_comp = MoveComponent::new(PI, 300.0);
             let mut input_comp = InputComponent::new(300.0, PI);
             input_comp.set_move_component(&mut move_comp);
 
+            actor.add_component(Box::new(sprite));
             actor.add_component(Box::new(move_comp));
             actor.add_component(Box::new(input_comp));
             actor.add_component(Box::new(ship));

@@ -78,6 +78,15 @@ impl Actor {
         self.active = active;
     }
 
+    pub fn get_component<T: 'static>(&self) -> Option<&T> {
+        for component in self.components.iter() {
+            if let Some(c) = component.as_ref().as_any().downcast_ref::<T>() {
+                return Some(c);
+            }
+        }
+        None
+    }
+
     pub fn get_component_mut<T: 'static>(&mut self) -> Option<&mut T> {
         for component in self.components.iter_mut() {
             if let Some(c) = component.as_mut().as_any_mut().downcast_mut::<T>() {

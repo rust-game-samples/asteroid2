@@ -2,6 +2,7 @@ use super::actor::Actor;
 use super::component::{Component, ComponentBase};
 use super::texture::Texture;
 use super::texture::TextureManager;
+use std::sync::Arc;
 use wgpu;
 
 pub struct SpriteComponent {
@@ -10,17 +11,21 @@ pub struct SpriteComponent {
     texture_width: i32,
     draw_order: i32,
     texture_name: String,
+    texture: Option<Arc<Texture>>,
 }
 
 impl SpriteComponent {
     pub fn new(texture_name: &str, draw_order: i32, texture_manager: &mut TextureManager) -> Self {
-        texture_manager.load_texture(texture_name); // テクスチャをロードのみ
+        texture_manager.load_texture(texture_name);
+        let texture = texture_manager.get_texture(texture_name);
+
         Self {
             base: ComponentBase::new(),
             texture_height: 0,
             texture_width: 0,
             draw_order,
             texture_name: texture_name.to_string(),
+            texture,
         }
     }
 
@@ -45,10 +50,12 @@ impl SpriteComponent {
 
     // 描画メソッド
     // 注: 実際の描画処理は別途実装が必要
-    pub fn draw(&self, render_pass: &mut wgpu::RenderPass) {
-        if let Some(actor) = self.owner() {
-            // TODO: 実際の描画処理を実装
-            // スプライトの位置、回転、スケールを使用して描画
+    pub fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
+        if let (Some(actor), Some(texture)) = (self.owner(), &self.texture) {
+            // テクスチャをバインド
+            render_pass.set_bind_group(0, &texture.bind_group, &[]);
+            // 三角形を描画
+            render_pass.draw(0..3, 0..1);
         }
     }
 }
@@ -71,6 +78,10 @@ impl Component for SpriteComponent {
     }
 
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any {
+        self
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
         self
     }
 }
