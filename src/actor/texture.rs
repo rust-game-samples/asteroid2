@@ -53,13 +53,29 @@ impl TextureManager {
     }
 
     pub fn load_texture(&mut self, filename: &str) -> Option<u32> {
+        println!("Attempting to load texture: {}", filename);
+
         if self.textures.contains_key(filename) {
+            println!("Texture already loaded: {}", filename);
             return Some(self.textures.len() as u32);
         }
 
         let path = Path::new("assets").join(filename);
-        let img = image::open(path).ok()?;
+        println!("Looking for texture at path: {:?}", path);
+
+        let img = match image::open(path) {
+            Ok(img) => {
+                println!("Successfully loaded image: {}", filename);
+                img
+            }
+            Err(e) => {
+                println!("Failed to load image: {} - Error: {}", filename, e);
+                return None;
+            }
+        };
+
         let dimensions = img.dimensions();
+        println!("Image dimensions: {}x{}", dimensions.0, dimensions.1);
 
         let texture = self.device.create_texture_with_data(
             &self.queue,
@@ -117,10 +133,15 @@ impl TextureManager {
             }),
         );
 
+        println!("Texture successfully created and stored: {}", filename);
         Some(self.textures.len() as u32)
     }
 
     pub fn get_texture(&self, filename: &str) -> Option<Arc<Texture>> {
         self.textures.get(filename).cloned()
+    }
+
+    pub fn get_bind_group_layout(&self) -> &wgpu::BindGroupLayout {
+        &self.bind_group_layout
     }
 }

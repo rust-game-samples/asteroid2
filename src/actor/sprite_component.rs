@@ -52,10 +52,8 @@ impl SpriteComponent {
     // 注: 実際の描画処理は別途実装が必要
     pub fn draw<'a>(&'a self, render_pass: &mut wgpu::RenderPass<'a>) {
         if let (Some(actor), Some(texture)) = (self.owner(), &self.texture) {
-            // テクスチャをバインド
             render_pass.set_bind_group(0, &texture.bind_group, &[]);
-            // 三角形を描画
-            render_pass.draw(0..3, 0..1);
+            render_pass.draw(0..6, 0..1); // 6頂点を描画
         }
     }
 }

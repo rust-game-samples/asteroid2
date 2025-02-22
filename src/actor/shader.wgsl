@@ -7,14 +7,21 @@ struct VertexOutput {
 };
 
 @vertex
-fn vs_main(
-    @builtin(vertex_index) in_vertex_index: u32,
-) -> VertexOutput {
+fn vs_main(@builtin(vertex_index) in_vertex_index: u32) -> VertexOutput {
     var out: VertexOutput;
-    let x = f32(i32(in_vertex_index) - 1);
-    let y = f32(i32(in_vertex_index & 1u) * 2 - 1);
-    out.clip_position = vec4<f32>(x, y, 0.0, 1.0);
-    out.tex_coords = vec2<f32>(x + 1.0, 1.0 - y) * 0.5;
+    var pos: vec2<f32>;
+    
+    switch(in_vertex_index) {
+        case 0u: { pos = vec2<f32>(-0.5, -0.5); }  // 左下
+        case 1u: { pos = vec2<f32>(0.5, -0.5); }   // 右下
+        case 2u: { pos = vec2<f32>(-0.5, 0.5); }   // 左上
+        case 3u: { pos = vec2<f32>(-0.5, 0.5); }   // 左上
+        case 4u: { pos = vec2<f32>(0.5, -0.5); }   // 右下
+        default: { pos = vec2<f32>(0.5, 0.5); }    // 右上
+    }
+    
+    out.clip_position = vec4<f32>(pos.x, pos.y, 0.0, 1.0);
+    out.tex_coords = vec2<f32>(pos.x + 0.5, 1.0 - (pos.y + 0.5));
     return out;
 }
 

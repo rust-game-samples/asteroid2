@@ -72,7 +72,13 @@ impl Game {
 
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: Some("Render Pipeline"),
-            layout: None, // 自動レイアウト
+            layout: Some(
+                &device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                    label: Some("Pipeline Layout"),
+                    bind_group_layouts: &[texture_manager.get_bind_group_layout()],
+                    push_constant_ranges: &[],
+                }),
+            ),
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: "vs_main",
@@ -108,6 +114,7 @@ impl Game {
         };
 
         // テクスチャを事前にロード
+        println!("Current directory: {:?}", std::env::current_dir().unwrap());
         game.texture_manager.load_texture("Ship.png");
         game.texture_manager.load_texture("Asteroid.png");
         game.texture_manager.load_texture("Laser.png");
@@ -145,7 +152,7 @@ impl Game {
 
     /// 入力処理
     fn process_input(&mut self) {
-        println!("Processing input with keys: {:?}", self.pressed_keys);
+        // println!("Processing input with keys: {:?}", self.pressed_keys);
         for actor in self.actors.values_mut() {
             if let Some(input) = actor.get_component_mut::<InputComponent>() {
                 input.process_input(&self.pressed_keys);

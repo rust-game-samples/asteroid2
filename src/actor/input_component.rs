@@ -25,7 +25,7 @@ impl InputComponent {
     }
 
     pub fn process_input(&mut self, keys: &[VirtualKeyCode]) {
-        println!("InputComponent processing keys: {:?}", keys);
+        // println!("InputComponent processing keys: {:?}", keys);
         if let Some(move_ptr) = self.move_component {
             let move_comp = unsafe { &mut *move_ptr };
 
